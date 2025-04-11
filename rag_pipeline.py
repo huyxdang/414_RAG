@@ -30,6 +30,7 @@ class RAGSystem:
             return "No documents loaded."
 
         # 3. RAG with RetrievalQA
-        retriever = self.vectorstore.as_retriever() # Converts vs. into retriever object (similarity search)
-        qa = RetrievalQA.from_chain_type(llm=ChatOpenAI(model_name="gpt-4"), retriever=retriever) # Pipeline to 1. embed user q ; 2. feed q and retriever into GPT ; 3. Return a response
+        retriever = self.vectorstore.as_retriever(search_kwargs={"k": top_k}) # Only uses the top-k most probably results -- since 414's concepts are clearly divided based on topics.
+        qa = RetrievalQA.from_chain_type(llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3), retriever=retriever) # Pipeline to 1. embed user q ; 2. feed q and retriever into GPT ; 3. Return a response
+        # Temperature is set to low to assign higher probabilities to frequently-appeared tokens --> Focus on facts instead of creativity
         return qa.run(query) # Run the pipeline on the user's query
